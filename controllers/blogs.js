@@ -10,6 +10,11 @@ router.get('/', async (req, res) => {
   res.json(blogs)
 })
 
+const blogFinder = async (req, res, next) => {
+  req.blog = await Blog.findByPk(req.params.id)
+  next()
+}
+
 router.post('/', async (req, res) => {
   console.log(req.body)
   try {
@@ -20,17 +25,20 @@ router.post('/', async (req, res) => {
   }
 })
 
-router.delete('/:id', async (req, res) => {
-  const blogId = req.params.id
-  try {
-    const blog = await Blog.findByPk(blogId);
-    if (!blog) {
-      return res.status(404).json({ error: 'Blog not found' })
-    }
-    await blog.destroy()
-    res.status(204).send() // No Content
-  } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' })
+router.delete('/:id', blogFinder, async (req, res) => {
+  if (req.blog) {
+    await req.blog.destroy()
+  }
+  res.status(204).end()
+})
+
+router.put('/:id', blogFinder, async(req, res) => {
+  if (req.blog) {
+    req.blog.likes = req.body.likes
+    await req.blog.save()
+    res.json(req.blog)
+  } else {
+    res.status(404).end()
   }
 })
 
