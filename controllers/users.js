@@ -12,12 +12,8 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-  try {
-    const user = await User.create(req.body)
-    res.json(user)
-  } catch (error) {
-    return res.status(400).json({ error })
-  }
+  const user = await User.create(req.body)
+  res.json(user)
 })
 
 router.get('/:id', async (req, res) => {
@@ -30,7 +26,7 @@ router.get('/:id', async (req, res) => {
 })
 
 router.put('/:username', async (req, res) => {
-  const username = req.params.username 
+  const username = req.params.username
   const newUsername = req.body.username
   const user = await User.findOne({ where: { username } })
   if (user) {
