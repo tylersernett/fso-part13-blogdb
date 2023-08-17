@@ -43,9 +43,16 @@ router.post('/', tokenExtractor, async (req, res) => {
   }
 })
 
-router.delete('/:id', blogFinder, async (req, res) => {
+router.delete('/:id', tokenExtractor, blogFinder, async (req, res) => {
+  const user = await User.findByPk(req.decodedToken.id)
   if (req.blog) {
-    await req.blog.destroy()
+    if (req.blog.userId===user.id) {
+      await req.blog.destroy()
+    } else {
+      return res.status(401).json({ error: 'cannot delete posts submitted by different user' })
+    }
+  } else {
+    return res.status(404).json({ error: 'cannot find blog id' })
   }
   res.status(204).end()
 })
