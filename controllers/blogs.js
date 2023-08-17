@@ -49,7 +49,7 @@ router.delete('/:id', tokenExtractor, blogFinder, async (req, res) => {
     if (req.blog.userId===user.id) {
       await req.blog.destroy()
     } else {
-      return res.status(401).json({ error: 'cannot delete posts submitted by different user' })
+      return res.status(403).json({ error: 'Forbidden: only submitter can delete blog' })
     }
   } else {
     return res.status(404).json({ error: 'cannot find blog id' })
