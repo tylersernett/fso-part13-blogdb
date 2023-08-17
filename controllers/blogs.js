@@ -10,6 +10,7 @@ router.get('/', async (req, res) => {
   res.json(blogs)
 })
 
+//MIDDLEWARE
 const blogFinder = async (req, res, next) => {
   req.blog = await Blog.findByPk(req.params.id)
   next()
@@ -18,7 +19,11 @@ const blogFinder = async (req, res, next) => {
 router.post('/', async (req, res) => {
   console.log(req.body)
   try {
-    const blog = await Blog.create(req.body)
+    //default to first user
+    const user = await User.findOne()    
+    const blog = await Blog.create({...req.body, userId: user.id})
+    
+    // const blog = await Blog.create(req.body)
     res.json(blog)
   } catch (error) {
     return res.status(400).json({ error })
