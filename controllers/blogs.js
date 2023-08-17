@@ -1,18 +1,40 @@
 const router = require('express').Router()
 const jwt = require('jsonwebtoken')
+const { Op } = require('sequelize')
 
 const { SECRET } = require('../util/config')
 const { Blog, User } = require('../models')
 
 router.get('/', async (req, res) => {
   // const blogs = await sequelize.query("SELECT * FROM blogs", { type: QueryTypes.SELECT })
+
+  const where = {}
+
+  if (req.query.search) {
+    const searchValue = `%${req.query.search}%`
+
+    where[Op.or] = [
+      {
+        title: {
+          [Op.iLike]: searchValue, //iLike is case insensitive
+        },
+      },
+      {
+        author: {
+          [Op.iLike]: searchValue,
+        },
+      },
+    ]
+  }
+
   const blogs = await Blog.findAll({
     attributes: { exclude: ['userId'] },
     include: {
       model: User,
       attributes: ['name']
-    }
-  });
+    },
+    where
+  })
   // console.log(blogs.map(b=>b.toJSON())) //use .toJSON to get rid of extraneous db info
   // console.log(JSON.stringify(blogs, null, 2))
   res.json(blogs)
