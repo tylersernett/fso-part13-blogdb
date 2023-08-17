@@ -33,7 +33,8 @@ router.get('/', async (req, res) => {
       model: User,
       attributes: ['name']
     },
-    where
+    where,
+    order: [['likes', 'DESC']],
   })
   // console.log(blogs.map(b=>b.toJSON())) //use .toJSON to get rid of extraneous db info
   // console.log(JSON.stringify(blogs, null, 2))
