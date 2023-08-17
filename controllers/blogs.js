@@ -6,7 +6,13 @@ const { Blog, User } = require('../models')
 
 router.get('/', async (req, res) => {
   // const blogs = await sequelize.query("SELECT * FROM blogs", { type: QueryTypes.SELECT })
-  const blogs = await Blog.findAll();
+  const blogs = await Blog.findAll({
+    attributes: { exclude: ['userId'] },
+    include: {
+      model: User,
+      attributes: ['name']
+    }
+  });
   // console.log(blogs.map(b=>b.toJSON())) //use .toJSON to get rid of extraneous db info
   // console.log(JSON.stringify(blogs, null, 2))
   res.json(blogs)
@@ -36,7 +42,7 @@ const tokenExtractor = (req, res, next) => {
 router.post('/', tokenExtractor, async (req, res) => {
   try {
     const user = await User.findByPk(req.decodedToken.id)
-    const blog = await Blog.create({ ...req.body, userId: user.id})
+    const blog = await Blog.create({ ...req.body, userId: user.id })
     res.json(blog)
   } catch (error) {
     return res.status(400).json({ error })
@@ -46,7 +52,7 @@ router.post('/', tokenExtractor, async (req, res) => {
 router.delete('/:id', tokenExtractor, blogFinder, async (req, res) => {
   const user = await User.findByPk(req.decodedToken.id)
   if (req.blog) {
-    if (req.blog.userId===user.id) {
+    if (req.blog.userId === user.id) {
       await req.blog.destroy()
     } else {
       return res.status(403).json({ error: 'Forbidden: only submitter can delete blog' })
