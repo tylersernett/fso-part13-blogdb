@@ -18,6 +18,13 @@ router.post('/', async (req, res) => {
 })
 
 router.get('/:id', async (req, res) => {
+  let where = {}
+  if (req.query.read === 'true' || req.query.read === 'false') {
+    where.read = req.query.read === 'true';
+  } else {
+    return res.status(400).json({ error: 'read query may only be true or false' })
+  }
+
   const user = await User.findByPk(req.params.id, {
     include: [
       //blogs submitted by user:
@@ -31,7 +38,8 @@ router.get('/:id', async (req, res) => {
         as: 'readings',
         attributes: { exclude: ['userId', 'createdAt', 'updatedAt'] },
         through: {
-          attributes: ['id', 'read'] //leave as empty array to prevent readingList from populating at all
+          attributes: ['id', 'read'], //leave as empty array to prevent readingList from populating at all
+          where,
         }
       },
     ]
