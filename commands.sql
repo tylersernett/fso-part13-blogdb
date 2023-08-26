@@ -1,4 +1,8 @@
 -- hours spent: 2 + 1.5 + 1 + 2.5 + 1 + 2 + 1.5 + 1.5 = 13
+
+--1 flyctl proxy 5432 -a fso-part13-blog-postgres
+--2 npm run dev
+--3 flyctl postgres connect -a fso-part13-blog-postgres
 CREATE TABLE blogs (
     id SERIAL PRIMARY KEY,
     author text,
