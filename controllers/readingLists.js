@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { tokenExtractor } = require('../util/middleware')
+const { tokenExtractor, userValidator } = require('../util/middleware')
 
 const { ReadingList, User } = require('../models')
 
@@ -8,10 +8,9 @@ router.post('/', async (req, res) => {
   res.json(readingList)
 })
 
-router.put('/:id', tokenExtractor, async (req, res) => {
+router.put('/:id', tokenExtractor, userValidator, async (req, res) => {
   const user = await User.findByPk(req.decodedToken.id)
   const readingList = await ReadingList.findByPk(req.params.id)
-
   if (!readingList) {
     return res.status(404).json({ error: 'Reading List ID not found' })
   }
